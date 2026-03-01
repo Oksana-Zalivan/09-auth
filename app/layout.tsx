@@ -6,6 +6,7 @@ import './globals.css';
 import Header from '@/components/Header/Header';
 import Footer from '@/components/Footer/Footer';
 import TanStackProvider from '@/components/TanStackProvider/TanStackProvider';
+import AuthProvider from '@/components/AuthProvider/AuthProvider';
 
 const roboto = Roboto({
   subsets: ['latin', 'cyrillic'],
@@ -18,7 +19,7 @@ const APP_NAME = 'NoteHub';
 const APP_DESCRIPTION =
   'NoteHub is a simple app to create, browse, and manage notes with tags and filters.';
 
-const SITE_URL = 'https://YOUR-PROJECT.vercel.app'; // <- заміни на свій домен Vercel
+const SITE_URL = 'https://YOUR-PROJECT.vercel.app';
 
 export const metadata: Metadata = {
   title: APP_NAME,
@@ -44,11 +45,13 @@ export default function RootLayout({ children, modal }: { children: ReactNode; m
     <html lang="en">
       <body className={roboto.variable}>
         <TanStackProvider>
-          <Header />
-          {children}
-          {modal}
-          <Footer />
-          <div id="modal-root" />
+          <AuthProvider>
+            <Header />
+            {children}
+            {modal}
+            <Footer />
+            <div id="modal-root" />
+          </AuthProvider>
         </TanStackProvider>
       </body>
     </html>

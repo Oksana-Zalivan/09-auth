@@ -49,9 +49,9 @@ export default function EditProfilePage() {
     setError('');
 
     try {
-      const updated = await updateMe({ username });
+      const updated = await updateMe({ username: username.trim() });
       setUser(updated);
-      router.push('/profile');
+      router.replace('/profile');
     } catch (e) {
       setError('Failed to update profile');
     }
@@ -59,7 +59,13 @@ export default function EditProfilePage() {
 
   const handleCancel = () => router.back();
 
-  if (isLoading) return <p className={css.mainContent}>Loading...</p>;
+  if (isLoading) {
+    return (
+      <main className={css.mainContent}>
+        <div className={css.profileCard}>Loading...</div>
+      </main>
+    );
+  }
 
   return (
     <main className={css.mainContent}>

@@ -3,8 +3,8 @@ import type { User } from '@/types/user';
 import type { Note, NoteTag } from '@/types/note';
 
 export type FetchNotesParams = {
-  page: number;
-  perPage: number;
+  page?: number;
+  perPage?: number; 
   search?: string;
   tag?: NoteTag;
 };
@@ -15,7 +15,12 @@ export type FetchNotesResponse = {
 };
 
 export async function fetchNotes(params: FetchNotesParams): Promise<FetchNotesResponse> {
-  const { data } = await api.get('/notes', { params });
+  const { page = 1, perPage = 12, search, tag } = params;
+
+  const { data } = await api.get('/notes', {
+    params: { page, perPage, search, tag },
+  });
+
   return data;
 }
 

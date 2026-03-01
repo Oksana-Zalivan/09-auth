@@ -16,7 +16,7 @@ export const initialDraft: DraftNote = {
 
 type NoteStore = {
   draft: DraftNote;
-  setDraft: (note: DraftNote) => void;
+  setDraft: (patch: Partial<DraftNote>) => void;
   clearDraft: () => void;
 };
 
@@ -24,7 +24,7 @@ export const useNoteStore = create<NoteStore>()(
   persist(
     set => ({
       draft: initialDraft,
-      setDraft: note => set({ draft: note }),
+      setDraft: patch => set(state => ({ draft: { ...state.draft, ...patch } })),
       clearDraft: () => set({ draft: initialDraft }),
     }),
     {

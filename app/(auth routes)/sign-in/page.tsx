@@ -2,8 +2,10 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+
 import { login } from '@/lib/api/clientApi';
 import { useAuthStore } from '@/lib/store/authStore';
+
 import css from './SignInPage.module.css';
 
 export default function SignInPage() {
@@ -17,14 +19,14 @@ export default function SignInPage() {
     setError('');
 
     const formData = new FormData(e.currentTarget);
-    const email = String(formData.get('email') ?? '');
+    const email = String(formData.get('email') ?? '').trim();
     const password = String(formData.get('password') ?? '');
 
     try {
       const user = await login({ email, password });
       setUser(user);
-      router.push('/profile');
-    } catch (err) {
+      router.replace('/profile');
+    } catch {
       setError('Login failed');
     }
   };
@@ -50,7 +52,7 @@ export default function SignInPage() {
           </button>
         </div>
 
-        <p className={css.error}>{error}</p>
+        {error && <p className={css.error}>{error}</p>}
       </form>
     </main>
   );
