@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import css from "./NoteList.module.css";
-import type { Note } from "@/types/note";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { deleteNote } from "@/lib/api";
+import Link from 'next/link';
+import css from './NoteList.module.css';
+import type { Note } from '@/types/note';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { deleteNote } from '@/lib/api/clientApi';
 
 interface NoteListProps {
   notes: Note[];
@@ -16,13 +16,13 @@ export default function NoteList({ notes }: NoteListProps) {
   const mutation = useMutation({
     mutationFn: (id: string) => deleteNote(id),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["notes"] });
+      await queryClient.invalidateQueries({ queryKey: ['notes'] });
     },
   });
 
   return (
     <ul className={css.list}>
-      {notes.map((note) => (
+      {notes.map(note => (
         <li className={css.listItem} key={note.id}>
           <div>
             <h2 className={css.title}>{note.title}</h2>
@@ -50,6 +50,3 @@ export default function NoteList({ notes }: NoteListProps) {
     </ul>
   );
 }
-
-
-
