@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { HydrationBoundary, dehydrate, QueryClient } from '@tanstack/react-query';
 import NoteDetailsClient from './NoteDetails.client';
-import { fetchNoteById } from '@/lib/api';
+import { fetchNoteById } from '@/lib/api/serverApi';
 
 const SITE_URL = 'https://08-zustand-six-gold.vercel.app';
 
