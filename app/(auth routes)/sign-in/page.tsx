@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, type FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 
 import { login } from '@/lib/api/clientApi';
@@ -12,9 +12,9 @@ export default function SignInPage() {
   const router = useRouter();
   const setUser = useAuthStore(s => s.setUser);
 
-  const [error, setError] = useState<string>('');
+  const [error, setError] = useState('');
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError('');
 

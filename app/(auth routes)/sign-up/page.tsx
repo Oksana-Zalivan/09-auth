@@ -1,9 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, type FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
+
 import { register } from '@/lib/api/clientApi';
 import { useAuthStore } from '@/lib/store/authStore';
+
 import css from './SignUpPage.module.css';
 
 export default function SignUpPage() {
@@ -12,7 +14,7 @@ export default function SignUpPage() {
 
   const [error, setError] = useState<string>('');
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError('');
 

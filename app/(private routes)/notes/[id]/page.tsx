@@ -1,13 +1,16 @@
 import type { Metadata } from 'next';
 import { HydrationBoundary, dehydrate, QueryClient } from '@tanstack/react-query';
+
 import NoteDetailsClient from './NoteDetails.client';
 import { fetchNoteById } from '@/lib/api/serverApi';
 
-const SITE_URL = 'https://08-zustand-six-gold.vercel.app';
-
 type PageProps = {
-  params: Promise<{ id: string }>;
+  params: { id: string };
 };
+
+function getSiteUrl() {
+  return (process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3000').replace(/\/$/, '');
+}
 
 function buildDescription(content?: string) {
   if (!content) return 'Open note details in NoteHub.';
@@ -16,24 +19,25 @@ function buildDescription(content?: string) {
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const { id } = await params;
+  const { id } = params;
+  const SITE_URL = getSiteUrl();
 
   try {
     const note = await fetchNoteById(id);
 
     const titleText = note?.title?.trim() || `Note ${id}`;
-    const descriptionText = buildDescription(note?.content);
-
+    const description = buildDescription(note?.content);
     const title = `${titleText} | NoteHub`;
-    const description = descriptionText;
+    const url = `${SITE_URL}/notes/${id}`;
 
     return {
       title,
       description,
+      alternates: { canonical: url },
       openGraph: {
         title,
         description,
-        url: `${SITE_URL}/notes/${id}`,
+        url,
         images: [
           {
             url: 'https://ac.goit.global/fullstack/react/notehub-og-meta.jpg',
@@ -46,16 +50,18 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       },
     };
   } catch {
-    const title = `Note details | NoteHub`;
+    const title = 'Note details | NoteHub';
     const description = 'Open note details in NoteHub.';
+    const url = `${SITE_URL}/notes/${id}`;
 
     return {
       title,
       description,
+      alternates: { canonical: url },
       openGraph: {
         title,
         description,
-        url: `${SITE_URL}/notes/${id}`,
+        url,
         images: [
           {
             url: 'https://ac.goit.global/fullstack/react/notehub-og-meta.jpg',
@@ -71,7 +77,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default async function NoteDetailsPage({ params }: PageProps) {
-  const { id } = await params;
+  const { id } = params;
 
   const queryClient = new QueryClient();
 
