@@ -1,33 +1,29 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-const PRIVATE_PREFIXES = ['/profile', '/notes'];
-const AUTH_PAGES = ['/sign-in', '/sign-up'];
+const PRIVATE_ROUTES = ['/profile', '/notes'];
+const AUTH_ROUTES = ['/sign-in', '/sign-up'];
 
-function isPrivatePath(pathname: string) {
-  return PRIVATE_PREFIXES.some(p => pathname.startsWith(p));
+function isRouteMatch(pathname: string, routes: string[]) {
+  return routes.some(route => pathname === route || pathname.startsWith(route + '/'));
 }
 
-function isAuthPage(pathname: string) {
-  return AUTH_PAGES.some(p => pathname.startsWith(p));
-}
+export function proxy(request: NextRequest) {
+  const { pathname } = request.nextUrl;
 
-export function middleware(req: NextRequest) {
-  const { pathname } = req.nextUrl;
+  const token = request.cookies.get('accessToken')?.value;
 
-  const accessToken = req.cookies.get('accessToken')?.value;
-  const refreshToken = req.cookies.get('refreshToken')?.value;
+  const isPrivate = isRouteMatch(pathname, PRIVATE_ROUTES);
+  const isAuth = isRouteMatch(pathname, AUTH_ROUTES);
 
-  const isAuthed = Boolean(accessToken || refreshToken);
-
-  if (!isAuthed && isPrivatePath(pathname)) {
-    const url = req.nextUrl.clone();
+  if (!token && isPrivate) {
+    const url = request.nextUrl.clone();
     url.pathname = '/sign-in';
     return NextResponse.redirect(url);
   }
 
-  if (isAuthed && isAuthPage(pathname)) {
-    const url = req.nextUrl.clone();
+  if (token && isAuth) {
+    const url = request.nextUrl.clone();
     url.pathname = '/profile';
     return NextResponse.redirect(url);
   }
@@ -36,5 +32,5 @@ export function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)'],
+  matcher: ['/profile/:path*', '/notes/:path*', '/sign-in', '/sign-up'],
 };
