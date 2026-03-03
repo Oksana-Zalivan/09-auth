@@ -61,13 +61,17 @@ export async function logout(): Promise<void> {
   await api.post('/auth/logout');
 }
 
-export async function checkSession(): Promise<User | null> {
-  const { data } = await api.get('/auth/session');
-  return data ?? null;
+export async function checkSession(): Promise<boolean> {
+  try {
+    await api.get('/auth/session');
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 export async function getMe(): Promise<User> {
-  const { data } = await api.get('/users/me');
+  const { data } = await api.get<User>('/users/me');
   return data;
 }
 

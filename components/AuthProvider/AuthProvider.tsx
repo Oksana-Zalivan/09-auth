@@ -3,56 +3,57 @@
 import { useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 
-import { checkSession, logout } from '@/lib/api/clientApi';
+import { checkSession, getMe, logout } from '@/lib/api/clientApi';
 import { useAuthStore } from '@/lib/store/authStore';
 
-type Props = { children: React.ReactNode };
+const PRIVATE_ROUTES = ['/profile', '/notes'];
 
 function isPrivatePath(pathname: string) {
-  return pathname.startsWith('/profile') || pathname.startsWith('/notes');
+  return PRIVATE_ROUTES.some(r => pathname === r || pathname.startsWith(r + '/'));
 }
 
-export default function AuthProvider({ children }: Props) {
-  const pathname = usePathname();
+export default function AuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
+  const pathname = usePathname();
+  const [loading, setLoading] = useState(false);
 
-  const { setUser, clearAuth } = useAuthStore();
-  const [loading, setLoading] = useState(true);
+  const setUser = useAuthStore(s => s.setUser);
+  const clearIsAuthenticated = useAuthStore(s => s.clearIsAuthenticated);
 
   useEffect(() => {
-    const run = async () => {
-      if (!isPrivatePath(pathname)) {
-        setLoading(false);
-        return;
-      }
+    let isMounted = true;
+
+    async function run() {
+      const needGuard = isPrivatePath(pathname);
+      if (!needGuard) return;
+
+      setLoading(true);
 
       try {
-        let user = null;
+        const ok = await checkSession();
+        if (!ok) throw new Error('No session');
 
-        try {
-          user = await checkSession();
-        } catch {
-          user = null;
-        }
-
-        if (!user) {
-          await logout().catch(() => {});
-          clearAuth();
-          router.replace('/sign-in');
-          return;
-        }
-
+        const user = await getMe();
         setUser(user);
+      } catch {
+        clearIsAuthenticated();
+        try {
+          await logout();
+        } catch {}
+        router.replace('/sign-in');
       } finally {
-        setLoading(false);
+        if (isMounted) setLoading(false);
       }
-    };
+    }
 
     run();
-  }, [pathname, setUser, clearAuth, router]);
+    return () => {
+      isMounted = false;
+    };
+  }, [pathname, router, setUser, clearIsAuthenticated]);
 
   if (loading && isPrivatePath(pathname)) {
-    return <div style={{ padding: 24 }}>Loading...</div>;
+    return <p>Loading...</p>;
   }
 
   return <>{children}</>;

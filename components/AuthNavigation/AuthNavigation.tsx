@@ -10,13 +10,13 @@ import css from './AuthNavigation.module.css';
 
 export default function AuthNavigation() {
   const router = useRouter();
-  const { user, isAuthenticated, clearAuth } = useAuthStore();
+  const { user, isAuthenticated, clearIsAuthenticated } = useAuthStore();
 
   const handleLogout = async () => {
     try {
       await logout();
     } finally {
-      clearAuth();
+      clearIsAuthenticated();
       router.replace('/sign-in');
     }
   };
