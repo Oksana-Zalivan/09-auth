@@ -49,7 +49,7 @@ export async function proxy(request: NextRequest) {
 
   if (isAuthenticated && isAuth) {
     const url = request.nextUrl.clone();
-    url.pathname = '/profile';
+    url.pathname = '/';
     const res = NextResponse.redirect(url);
     applySetCookieHeaders(res, sessionSetCookie);
     return res;
